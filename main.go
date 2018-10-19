@@ -9,10 +9,18 @@ import (
 	"strconv"
 )
 
+var version = "undefined"
+
 func main() {
 	pretty := flag.Bool("p", false, "pretty print")
 	escape := flag.Bool("e", false, "quote print")
+	vv := flag.Bool("v", false, "print version")
 	flag.Parse()
+
+	if *vv {
+		fmt.Fprintln(os.Stdout, version)
+		os.Exit(0)
+	}
 
 	if flag.NArg() < 1 {
 		flag.Usage()
