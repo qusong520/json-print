@@ -34,14 +34,18 @@ func main() {
 		os.Exit(2)
 	}
 
-	jsonM := make(map[string]interface{})
-	if err := json.Unmarshal(bs, &jsonM); err != nil {
+	var jsonObj interface{} = make(map[string]interface{})
+	if len(bs) > 0 && bs[0] == '[' {
+		jsonObj = make([]map[string]interface{}, 0)
+	}
+
+	if err := json.Unmarshal(bs, &jsonObj); err != nil {
 		fmt.Fprintf(os.Stderr, "parse json fail: %v\n", err)
 		os.Exit(3)
 	}
 
 	if *pretty {
-		r, err := json.MarshalIndent(jsonM, "", "    ")
+		r, err := json.MarshalIndent(jsonObj, "", "    ")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "print json fail: %v\n", err)
 			os.Exit(4)
@@ -49,7 +53,7 @@ func main() {
 		fmt.Fprintf(os.Stdout, "%s\n", string(r))
 		os.Exit(0)
 	} else {
-		r, err := json.Marshal(jsonM)
+		r, err := json.Marshal(jsonObj)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "print json fail: %v\n", err)
 			os.Exit(5)
