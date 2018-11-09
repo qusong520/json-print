@@ -22,16 +22,24 @@ func main() {
 		os.Exit(0)
 	}
 
+	var readFromStdinFlag bool
+	var bs []byte
 	if flag.NArg() < 1 {
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	filepath := flag.Arg(0)
-	bs, err := ioutil.ReadFile(filepath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "read file fail: %v\n", err)
-		os.Exit(2)
+		inBS, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "read from stdin fail: %v\n", err)
+			os.Exit(2)
+		}
+		bs = inBS
+		readFromStdinFlag = true
+	} else {
+		filepath := flag.Arg(0)
+		fileBS, err := ioutil.ReadFile(filepath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "read file fail: %v\n", err)
+			os.Exit(2)
+		}
+		bs = fileBS
 	}
 
 	var jsonObj interface{} = make(map[string]interface{})
@@ -50,6 +58,9 @@ func main() {
 			fmt.Fprintf(os.Stderr, "print json fail: %v\n", err)
 			os.Exit(4)
 		}
+		if readFromStdinFlag {
+			fmt.Fprintln(os.Stdout)
+		}
 		fmt.Fprintf(os.Stdout, "%s\n", string(r))
 		os.Exit(0)
 	} else {
@@ -64,6 +75,9 @@ func main() {
 			s = strconv.Quote(s)
 		}
 
+		if readFromStdinFlag {
+			fmt.Fprintln(os.Stdout)
+		}
 		fmt.Fprintf(os.Stdout, "%s\n", s)
 		os.Exit(0)
 	}
